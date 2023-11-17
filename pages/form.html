@@ -1,0 +1,237 @@
+<div>
+  <!-- start Page Title -->
+  <!-- Later, consider how to integrate it into the editor. -->
+  <div class="pagetitle">
+    <h1>Form Elements</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#/form">Home</a></li>
+        <li class="breadcrumb-item"><a>Forms</a></li>
+        <li class="breadcrumb-item active"><a>Elements</a></li>
+        <div class="d-flex d-none mx-3 title-toolbar">
+          <small class="text-muted mx-1">Link:</small
+          ><input
+            type="text"
+            class="form-control field mx-1"
+            name="title-link-config"
+            id="field-id-835598"
+            style="width: 100px; height: 1.4rem"
+          />
+          <div class="form-check-box">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                value="active"
+                name="title-active-config"
+                id="title-active-config-777368"
+                class="form-check-input field"
+              /><label for="title-active-config-777368" class="form-check-label"
+                >active</label
+              >
+            </div>
+          </div>
+          <button class="btn btn-primary btn-exsm add-bread-item mx-1">
+            Add
+          </button>
+          <button class="btn btn-danger btn-exsm delete-bread-item mx-1">
+            Delete
+          </button>
+        </div>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <div class="layout-container d-flex">
+    <!-- layout-item1 -->
+    <div class="layout-item card col-6">
+      <div
+        class="moving-bar"
+        data-bs-toggle="tooltip"
+        data-bs-title="Drag Me!"
+      ></div>
+      <h5 class="card-title">General Form Elements</h5>
+
+      <!-- General Form Elements -->
+      <form
+        id="form1"
+        data-design="form"
+        class="form"
+        data-source="https://192.168.2.228/api/common/DevUser"
+      >
+        <span class="badge rounded-pill bg-primary id-badge">from1</span>
+        <button class="btn btn-warning toggle-readonly mb-3">edit</button>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="form-label col-sm-2 col-form-label"
+            >ID</label
+          >
+          <div class="col-sm-10">
+            <input type="text" class="form-control field" name="id" />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Name</label
+          >
+          <div class="col-sm-10">
+            <input type="text" class="form-control field" name="name" />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="number">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >age</label
+          >
+          <div class="col-sm-10">
+            <input type="number" class="form-control field" name="age" />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Address</label
+          >
+          <div class="col-sm-10">
+            <input type="text" class="form-control field" name="address" />
+          </div>
+        </div>
+      </form>
+      <!-- End General Form Elements -->
+      <div class="submit-box p-2">
+        <div
+          class="submit-moving-bar"
+          data-bs-toggle="tooltip"
+          data-bs-title="Drag Me!"
+        ></div>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          form="form1"
+          href="#/table"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <!-- layout-item2 -->
+    <div class="layout-item card col-6">
+      <div
+        class="moving-bar"
+        data-bs-toggle="tooltip"
+        data-bs-title="Drag Me!"
+      ></div>
+      <h5 class="card-title">General Form Elements</h5>
+
+      <!-- General Form Elements -->
+      <form id="form2" class="form" data-design="form" data-source="">
+        <span class="badge rounded-pill bg-primary id-badge">from2</span>
+        <div class="row mb-3 mx-1 field-box col-12" data-type="radio">
+          <label class="form-label">Gender</label>
+          <div class="form-check-box">
+            <div class="form-check">
+              <input
+                class="form-check-input field"
+                type="radio"
+                name="gender"
+                value="Male"
+                id="flexRadioDefault1"
+              />
+              <label class="form-check-label" for="flexRadioDefault1">
+                Male
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input field"
+                type="radio"
+                name="gender"
+                value="Female"
+                id="flexRadioDefault2"
+              />
+              <label class="form-check-label" for="flexRadioDefault2">
+                Female
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3 mx-1 field-box col-12" data-type="checkbox">
+          <label class="form-label">Interest</label>
+          <div class="form-check-box">
+            <div class="form-check">
+              <input
+                class="form-check-input field"
+                type="checkbox"
+                value="Sport"
+                id="flexCheckDefault"
+                name="interest"
+              />
+              <label class="form-check-label" for="flexCheckDefault">
+                Sport
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input field"
+                type="checkbox"
+                value="Music"
+                id="flexCheckChecked"
+                name="interest"
+              />
+              <label class="form-check-label" for="flexCheckChecked">
+                Music
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input field"
+                type="checkbox"
+                value="Sleep"
+                id="flexCheckChecked1"
+                name="interest"
+              />
+              <label class="form-check-label" for="flexCheckChecked1">
+                Sleep
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3 g-0 field-box col-12" data-type="treeselect">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Single select</label
+          >
+          <span
+            name="singleselect"
+            class="treeselect field"
+            data-multiple="false"
+            data-source=""
+          ></span>
+        </div>
+        <div class="row mb-3 g-0 field-box col-12" data-type="treeselect">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Multiple select</label
+          >
+          <div
+            name="multipleselect"
+            class="treeselect field"
+            data-multiple="true"
+            data-source=""
+          ></div>
+        </div>
+      </form>
+      <!-- End General Form Elements -->
+      <div class="submit-box p-2">
+        <div
+          class="submit-moving-bar"
+          data-bs-toggle="tooltip"
+          data-bs-title="Drag Me!"
+        ></div>
+        <button
+          type="submit"
+          class="btn btn-info text-light"
+          form="form2"
+          href="#/table"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

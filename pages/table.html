@@ -1,0 +1,198 @@
+<div>
+  <!-- start Page Title -->
+  <!-- Later, consider how to integrate it into the editor. -->
+  <div class="pagetitle">
+    <h1>Data Tables</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#/form">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Data Table</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+  <div class="layout-container d-flex">
+    <div class="layout-item card col-lg-12">
+      <div class="moving-bar" data-bs-toggle="tooltip" data-bs-title="Drag Me!"></div>
+      <h5 class="card-title">General Table Elements</h5>
+      <!-- General Table Elements -->
+      <div class="table-box">
+        <div class="resize-wrapper">
+          <table
+            id="table1"
+            class="table table-striped w-100"
+            data-design="table"
+            data-filter="true"
+            data-pagination="true"
+            data-add="#/form"
+            data-idkey="idno"
+            data-modalAdd="test-modal"
+            data-source=""
+          >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="">
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="text"
+                    >
+                    <label class="form-label"></label>
+                      <input type="text" class="form-control field" name="id" />
+                    </div>
+                  </form>
+                </td>
+                <td class="">
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                    >
+                    <label class="form-label"></label>
+                      <span class="form-text field" name="name" id="column-id-514320"
+                        >New Text</span
+                      >
+                    </div>
+                    </div>
+                  </form>
+                </td>
+                <td class="">
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                    >
+                    <label class="form-label"></label>
+                      <span class="form-text field" name="age" id="column-id-514320"
+                        >New Text</span
+                      >
+                    </div>
+                  </form>
+                </td>
+                <td class="">
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                    >
+                    <label class="form-label"></label>
+                      <span class="form-text field" name="address" id="column-id-514320"
+                        >New Text</span
+                      >
+                    </div>
+                  </form>
+                </td>
+                <td>
+                  <a
+                    href="#/form"
+                    type="button"
+                    class="btn btn-warning edit-btn"
+                    >Edit</a
+                  >
+                  <button
+                    data-bs-toggle="modal"
+                    data-bs-target="#testModal"
+                    class="btn btn-warning edit-btn modal-edit"
+                  >
+                    edit By Modal
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <span class="badge rounded-pill bg-primary id-badge">table1</span>
+        </div>
+      </div>
+      <!-- End General Table Elements -->
+    </div>
+  </div>
+  <!-- test modal -->
+  <div class="modal fade" id="test-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Form</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form
+            data-design="form"
+            data-source="https://192.168.2.228/api/common/DevUser"
+          >
+            <div class="row mb-3">
+              <label for="field-415" class="col-sm-2 col-form-label form-label">ID</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="id"
+                  id="field-415"
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label form-label"
+                >Name</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label form-label">age</label>
+              <div class="col-sm-10">
+                <input
+                  type="number"
+                  class="form-control"
+                  name="age"
+                  data-type=""
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label form-label"
+                >Address</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="address"
+                  data-type=""
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label form-label">Submit Button</label>
+              <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary" href="#/">
+                  Submit Form
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+  </div>
+</div>

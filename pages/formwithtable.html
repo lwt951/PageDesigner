@@ -1,0 +1,192 @@
+<div>
+  <!-- start Page Title -->
+  <!-- Later, consider how to integrate it into the editor. -->
+  <div class="pagetitle">
+    <h1>Form Elements</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#/form">Home</a></li>
+        <li class="breadcrumb-item">Forms</li>
+        <li class="breadcrumb-item active">Elements</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <div class="layout-container d-flex">
+    <!-- layout-item1 -->
+    <div class="layout-item border-0" data-modal="modal1">
+      <div class="moving-bar" data-bs-toggle="tooltip" data-bs-title="Drag Me!"></div>
+      <h5 class="card-title">General Form Elements</h5>
+      <!-- General Form Elements -->
+      <form
+        id="form1"
+        data-design="form"
+        class="form"
+        data-source=""
+        data-tableid="table1"
+      >
+      <span class="badge rounded-pill bg-primary id-badge">form1</span>
+        <button class="btn btn-warning toggle-readonly mb-3">edit</button>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="form-label col-sm-2 col-form-label"
+            >ID</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="text"
+              class="form-control field"
+              name="id"
+            />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Name</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="text"
+              class="form-control field"
+              name="name"
+              data-type=""
+            />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="number">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >age</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="number"
+              class="form-control field"
+              name="age"
+              data-type=""
+            />
+          </div>
+        </div>
+        <div class="row mb-3 field-box col-12" data-type="text">
+          <label for="inputText" class="col-sm-2 form-label col-form-label"
+            >Address</label
+          >
+          <div class="col-sm-10">
+            <input
+              type="text"
+              class="form-control field"
+              name="address"
+              data-type=""
+            />
+          </div>
+        </div>
+      </form>
+      <!-- End General Form Elements -->
+      <div class="submit-box p-2">
+        <div class="submit-moving-bar" data-bs-toggle="tooltip" 
+        data-bs-title='Drag Me!'></div>
+        <button
+          type="submit"
+          class="btn btn-info text-light"
+          form="form1"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <!-- layout-item2 -->
+    <div class="layout-item card col-lg-6">
+      <div class="moving-bar" data-bs-toggle="tooltip" data-bs-title="Drag Me!"></div>
+      <h5 class="card-title">General Table Elements</h5>
+
+      <!-- General Table Elements -->
+      <div class="table-box">
+        <div class="resize-wrapper">
+          <table
+            id="table1"
+            class="table table-striped w-100"
+            data-design="table"
+            data-filter="true"
+            data-pagination="true"
+            data-add="#/form"
+            data-edit="#/form"
+            data-idKey="idno"
+            data-modaladd="modal1"
+            data-modaledit="modal1"
+            data-source=""
+          >
+            <thead>
+              <tr>
+                <th contenteditable="true">ID</th>
+                <th contenteditable="true">Name</th>
+                <th contenteditable="true">Age</th>
+                <th contenteditable="true">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="text"
+                    >
+                    <label class="form-label"></label>
+                      <input type="text" class="form-control field" name="id" />
+                    </div>
+                  </form>
+                </td>
+                <td>
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                      draggable="false"
+                    >
+                    <label class="form-label"></label>
+                      <span class="form-text field" name="name" id="column-id-514320"
+                        >New Text</span
+                      >
+                    </div>
+                  </form>
+                </td>
+                <td>
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                      draggable="false"
+                    >
+                    <label class="form-label"></label>
+                      <span class="form-text field" name="age" id="column-id-423460"
+                        >New Text</span
+                      >
+                    </div>
+                  </form>
+                </td>
+                <td>
+                  <form class="td-box row g-0">
+                    <div
+                      class="field-box col-12"
+                      data-type="content"
+                      draggable="false"
+                    >
+                    <label class="form-label"></label>
+                      <span
+                        class="form-text field"
+                        name="address"
+                        id="column-id-456510"
+                        >New Text</span
+                      >
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <span class="badge rounded-pill bg-primary id-badge">table1</span>
+        </div>
+      </div>
+      <!-- End General Form Elements -->
+    </div>
+  </div>
+</div>
