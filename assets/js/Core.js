@@ -1311,30 +1311,22 @@ class Core {
     return this;
   }
 
-  setToolbarDraggable(toolbar = this.toolbar) {
-    if (!this.isEl(toolbar)) {
+  setToolbarPosition(target, toolbar = this.toolbar) {
+    if (!this.isEl(target) || !this.isEl(toolbar)) {
       return;
     }
+    const targetRect = target.getBoundingClientRect();
+    const targetPositionX = targetRect.x;
+    const targetPositionY = targetRect.top + window.scrollY;
+    const targetWidth = targetRect.width;
+    const toolbarWidth = parseInt(window.getComputedStyle(toolbar).width);
+    const newPositionX =
+      toolbarWidth > targetPositionX
+        ? targetPositionX + targetWidth + 20
+        : targetPositionX - toolbarWidth - 20;
 
-    const position = { x: 0, y: 0 };
-
-    interact(toolbar).draggable({
-      ignoreFrom: '.form-floating',
-      inertia: true,
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: document.body,
-          endOnly: true
-        })
-      ],
-      listeners: {
-        move(e) {
-          position.x += e.dx;
-          position.y += e.dy;
-          e.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
-        }
-      }
-    });
+    toolbar.style.left = `${newPositionX}px`;
+    toolbar.style.top = `${targetPositionY}px`;
 
     return this;
   }
@@ -1740,10 +1732,16 @@ class Page extends Core {
     this.root.innerHTML = designHtml;
     this.container = this.rootSelect('.layout-container');
 
-    if(!this.container) {
+    if (!this.container) {
       this._initContainer();
     }
-    
+
+    const scripts = this.root.querySelectorAll('script');
+
+    for (const script of scripts) {
+      this.runScript(script);
+    }
+
     this._toggleDesignItemToModal(false);
     const designEls = this.rootSelect('[data-design]', true);
 
@@ -1864,8 +1862,8 @@ class Page extends Core {
       return this;
     }
 
-    const tabBox = tabpane.querySelector('.nav-tabs');
-    const tabContentBox = tabpane.querySelector('.tab-content');
+    const tabBox = tabpaneBox.querySelector('.nav-tabs');
+    const tabContentBox = tabpaneBox.querySelector('.tab-content');
     const addTabBtn = tabBox.querySelector('.add-tab');
 
     const tabContentId = `tabName-${this.getRandom()}`;
@@ -2389,6 +2387,12 @@ class Page extends Core {
 
           this._toggleNowLayoutItem(targetPositionEl);
 
+          if (movedItem.dataset.design) {
+            movedItem.click();
+          } else {
+            movedItem.querySelector('[data-design]')?.click();
+          }
+
           if (movedItem.dataset.design !== 'form') {
             return; // Only design-form needs special handling because of submit btn.
           }
@@ -2593,6 +2597,7 @@ class FormEditor extends Core {
   }
 
   toggleToolbar(isShow = true) {
+    this.setToolbarPosition(this.nowForm);
     this.toolbar.classList.toggle('d-none', !isShow);
     return this;
   }
@@ -2730,8 +2735,6 @@ class FormEditor extends Core {
 
       nowLayoutItem?.insertBefore(submitBtn, this.nowForm.nextElementSibling);
     });
-
-    this.setToolbarDraggable(this.toolbar);
 
     return this;
   }
@@ -3374,6 +3377,7 @@ class TableEditor extends Core {
   }
 
   toggleToolbar(isShow = true) {
+    this.setToolbarPosition(this.nowTable);
     this.toolbar.classList.toggle('d-none', !isShow);
     return this;
   }
@@ -3538,8 +3542,6 @@ class TableEditor extends Core {
       e.preventDefault();
       this.deleteTableBox();
     });
-
-    this.setToolbarDraggable(this.toolbar);
 
     return this;
   }
@@ -5056,8 +5058,6 @@ class ChartEditor extends Core {
       this.deleteChartBox();
     });
 
-    this.setToolbarDraggable(this.toolbar);
-
     return this;
   }
 
@@ -5131,11 +5131,12 @@ class ChartEditor extends Core {
         return;
       }
 
-      const chartBox = e.target.closest('.chart-box');
-      const needToggle = chartBox && chartBox !== this.nowChartBox;
+      const cilckChartBox = e.target.closest('.chart-box');
+      const needToggle = cilckChartBox && cilckChartBox !== this.nowChartBox;
 
       this.toggleToolbar(needToggle);
-      this._toggleNowChartBox(needToggle ? chartBox : null);
+      this._toggleNowChartBox(needToggle ? cilckChartBox : null);
+      this.setToolbarPosition(this.nowChartBox);
     };
 
     return this;
@@ -5336,6 +5337,7 @@ class Menu extends Core {
     this.el = config.el;
     this.id = config.id;
     this.menuEditor = null;
+    this.nowMenuItem = null;
     this.source = config.source;
     this.toolbar = null;
     this._eventHandler = {};
@@ -5389,13 +5391,19 @@ class Menu extends Core {
   _bindToolbarEvent() {
     const toolbar = this.toolbar;
 
-    const updateBtn = toolbar.querySelector('[name="update-menu"]');
-    updateBtn.addEventListener('click', () => {
-      const data = this.getFieldsData(toolbar);
-      const itemData = this._convertDataFormat(data);
+    const configInputNames = [
+      'menu-text-config',
+      'menu-icon-config',
+      'menu-link-config'
+    ];
 
-      this.menuEditor.update(itemData);
-    });
+    for (const name of configInputNames) {
+      const configInput = this.toolbar.querySelector(`[name="${name}"]`);
+
+      configInput?.addEventListener('input', () => {
+        this._updateMenuData();
+      });
+    }
 
     const addBtn = toolbar.querySelector('[name="add-menu"]');
     addBtn.addEventListener('click', () => {
@@ -5403,7 +5411,10 @@ class Menu extends Core {
       const itemData = this._convertDataFormat(data);
 
       this.menuEditor.add(itemData);
-      this.clearFieldsData(toolbar);
+      const menuItems = this.el.querySelectorAll('.list-group-item');
+      const newItem = menuItems[menuItems.length - 1];
+
+      newItem.querySelector('.btn').click(); // trigger editing
     });
   }
 
@@ -5472,6 +5483,7 @@ class Menu extends Core {
           const childAEl = this.createEl(
             'a',
             {
+              class: 'nav-link',
               href: childItem.href
             },
             [childIconEl, childTextEl]
@@ -5519,9 +5531,12 @@ class Menu extends Core {
     });
 
     this.menuEditor.onClickEdit((event) => {
-      let itemData = event.item.getDataset();
+      const menuItem = event.item;
+      const itemData = menuItem.getDataset();
       this._setToolbarData(itemData);
-      this.menuEditor.edit(event.item); // set the item in edit mode
+      this.nowMenuItem = menuItem;
+      this.menuEditor.edit(this.nowMenuItem); // set the item in edit mode
+      this._toggleNowMenuItemClass();
     });
   }
 
@@ -5576,14 +5591,6 @@ class Menu extends Core {
       'menu-tooltip-config',
       'Tooltip'
     );
-    const updateBtn = this.createEl(
-      'button',
-      {
-        class: 'btn btn-secondary mb-1',
-        name: 'update-menu'
-      },
-      ['Update']
-    );
     const addBtn = this.createEl(
       'button',
       {
@@ -5601,13 +5608,14 @@ class Menu extends Core {
         iconInputBox,
         linkInputBox,
         // tooltipInputBox, // When needed, open it *****
-        updateBtn,
         addBtn
       ]
     );
 
     document.body.append(toolbar);
     this.toolbar = toolbar;
+    this.setToolbarPosition(this.el);
+    toolbar.style.top = `${parseInt(toolbar.style.top) + 20}px`;
     this._bindToolbarEvent();
 
     return this;
@@ -5618,6 +5626,30 @@ class Menu extends Core {
 
     this.clearFieldsData(this.toolbar);
     this.setFieldsData(this.toolbar, data);
+
+    return this;
+  }
+
+  _toggleNowMenuItemClass(menuItem = this.nowMenuItem) {
+    const lastEditingItem = this.el.querySelector('.editing');
+    lastEditingItem?.classList.remove('editing');
+
+    if (!menuItem) {
+      return;
+    }
+
+    const menuItemEl = menuItem.element;
+    menuItemEl.firstChild.classList.add('editing');
+
+    return this;
+  }
+
+  _updateMenuData() {
+    const data = this.getFieldsData(this.toolbar);
+    const itemData = this._convertDataFormat(data);
+
+    this.menuEditor.update(itemData);
+    this.menuEditor.edit(this.nowMenuItem); // set the item in edit mode
 
     return this;
   }
