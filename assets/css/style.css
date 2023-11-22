@@ -812,7 +812,7 @@ h6 {
 /* body */
 
 body.editing {
-  margin-right: 160px;
+  padding-right: 160px;
   transition: 0.3s;
 }
 

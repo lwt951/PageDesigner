@@ -1745,8 +1745,6 @@ class Page extends Core {
     this._toggleDesignItemToModal(false);
     const designEls = this.rootSelect('[data-design]', true);
 
-    this._initPageTitle();
-
     for (const designEl of designEls) {
       this._initDesignItem(designEl);
     }
@@ -1833,6 +1831,7 @@ class Page extends Core {
       isEditing ? this.rootSelect('.tab-pane-edit') : null
     );
     this._toggleTabpaneEditing(isEditing);
+    this._toggleTitleEditable(isEditing);
 
     if (isEditing) {
       this._setDesignElSortable();
@@ -1916,6 +1915,22 @@ class Page extends Core {
     return this;
   }
 
+  _addTitle(layoutItem = this.nowLayoutItem) {
+    const title = this.createEl(
+      'h5',
+      {
+        class: 'card-title',
+        contenteditable: 'plaintext-only'
+      },
+      ['New Title']
+    );
+    layoutItem?.append(title);
+
+    this._bindTitleEvent(title);
+
+    return this;
+  }
+
   _bindModalEvent(modal) {
     if (!this.isEl(modal)) {
       return;
@@ -1939,6 +1954,23 @@ class Page extends Core {
 
       this.setFieldsData(modal, data);
     });
+
+    return this;
+  }
+
+  _bindTitleEvent(title) {
+    if (!this.isEl(title)) {
+      return this;
+    }
+
+    title.onkeydown = (event) => {
+      if (
+        (event.key === 'Delete' || event.key === 'Backspace') &&
+        title.innerHTML.length === 0
+      ) {
+        title.remove();
+      }
+    };
 
     return this;
   }
@@ -2028,6 +2060,11 @@ class Page extends Core {
       const nowTabContent = this.nowTabPane?.querySelector('.tab-pane.active');
 
       chartEditor.addChart(nowTabContent || this.nowLayoutItem);
+    });
+
+    const addTitleBtn = toolbar.querySelector('[name="add-title"]');
+    addTitleBtn.addEventListener('click', () => {
+      this._addTitle(this.nowLayoutItem);
     });
 
     const addTabpaneBtn = toolbar.querySelector('[name="add-tabpane"]');
@@ -2316,6 +2353,14 @@ class Page extends Core {
       { class: 'text-muted mb-1 mt-2' },
       ['Others']
     );
+    const addTitleBtn = this.createEl(
+      'button',
+      {
+        class: 'btn btn-secondary mb-1',
+        name: 'add-title'
+      },
+      ['Add Title']
+    );
     const addTabpaneBtn = this.createEl(
       'button',
       {
@@ -2342,6 +2387,7 @@ class Page extends Core {
         addTableBtn,
         addChartBtn,
         othersLabel,
+        addTitleBtn,
         addTabpaneBtn
       ]
     );
@@ -2383,9 +2429,9 @@ class Page extends Core {
         onEnd: (e) => {
           const movedItem = e.item;
           const oldPositionEl = e.srcElement;
-          const targetPositionEl = e.to;
+          const targetEl = e.to;
 
-          this._toggleNowLayoutItem(targetPositionEl);
+          this._toggleNowLayoutItem(targetEl);
 
           if (movedItem.dataset.design) {
             movedItem.click();
@@ -2402,10 +2448,7 @@ class Page extends Core {
 
           if (submitBtn) {
             const submitBox = submitBtn.closest('.submit-box');
-            targetPositionEl.insertBefore(
-              submitBox,
-              movedItem.nextElementSibling
-            );
+            targetEl.insertBefore(submitBox, movedItem.nextElementSibling);
           }
         }
       });
@@ -2480,6 +2523,7 @@ class Page extends Core {
     this.nowLayoutItem?.classList.add('editing');
     this.setToolbarData(this.nowLayoutItem);
     this._toggleToolbarConfig();
+    this._toggleToolbarDisabled(newLayoutItem);
 
     return this;
   }
@@ -2514,6 +2558,20 @@ class Page extends Core {
     return this;
   }
 
+  _toggleTitleEditable(isEditable = true) {
+    const titles = this.rootSelect('.card-title', true);
+
+    for (const title of titles) {
+      title.setAttribute(
+        'contenteditable',
+        isEditable ? 'plaintext-only' : false
+      );
+      this._bindTitleEvent(title);
+    }
+
+    return this;
+  }
+
   _toggleToolbarConfig() {
     const modalConfigSwitch = this.toolbar.querySelector(
       '[name="layout-modal-config"]'
@@ -2524,6 +2582,26 @@ class Page extends Core {
     const modalIdConfigField = modalIdConfigInput.closest('.form-floating');
 
     modalIdConfigField.classList.toggle('d-none', !modalConfigSwitch.checked);
+
+    return this;
+  }
+
+  _toggleToolbarDisabled(isEnabled = true) {
+    const addBtnNames = [
+      'add-form',
+      'add-table',
+      'add-chart',
+      'add-title',
+      'add-tabpane'
+    ];
+
+    for (const name of addBtnNames) {
+      const btn = this.toolbar.querySelector(`[name="${name}"]`);
+
+      isEnabled
+        ? btn.removeAttribute('disabled')
+        : btn.setAttribute('disabled', 'disalbled');
+    }
 
     return this;
   }
@@ -2557,14 +2635,7 @@ class FormEditor extends Core {
     const form = this._createForm();
     target.append(form);
 
-    // set field sortable
-    const sortableInstance = new Sortable(form, {
-      handle: '.field-box',
-      group: 'form',
-      animation: 150,
-      ghostClass: 'moving'
-    });
-    this._sortableInstances.push(sortableInstance);
+    this._toggleFormsFieldSortable(true);
 
     // trigger focus on the new form
     setTimeout(() => {
@@ -3055,7 +3126,7 @@ class FormEditor extends Core {
     const forms = this.container.querySelectorAll('[data-design="form"]');
 
     this._toggleEvent(isEditing);
-    this._toggleFormsSortable(isEditing);
+    this._toggleFormsFieldSortable(isEditing);
 
     // force to stop form's readonly mode and toggle submit button disabled state.
     for (const form of forms) {
@@ -3075,7 +3146,7 @@ class FormEditor extends Core {
     return this;
   }
 
-  _toggleFormsSortable(isSortable = true) {
+  _toggleFormsFieldSortable(isSortable = true) {
     if (isSortable) {
       this._sortableInstances = [];
       const forms = this.container.querySelectorAll('[data-design="form"]');
@@ -3085,7 +3156,15 @@ class FormEditor extends Core {
           handle: '.field-box',
           group: 'form',
           animation: 150,
-          ghostClass: 'moving'
+          ghostClass: 'moving',
+          onEnd: (e) => {
+            const targetEl = e.to;
+            const idBadge = targetEl.querySelector('.id-badge');
+
+            if (targetEl.firstChild !== idBadge) {
+              targetEl.insertBefore(idBadge, targetEl.firstChild);
+            }
+          }
         });
 
         this._sortableInstances.push(sortableInstance);
