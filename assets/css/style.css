@@ -830,6 +830,10 @@ body.editing {
   flex-wrap: wrap;
 }
 
+body.editing .layout-item {
+  box-shadow: rgb(203 202 202 / 30%) 0px 0px 0px 2px;
+}
+
 .layout-item {
   position: relative;
   padding: 15px;
@@ -843,7 +847,7 @@ body.editing {
 .layout-item.editing,
 .tab-pane-box.editing {
   border: none;
-  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px !important;
 }
 
 .layout-item .moving-bar,
