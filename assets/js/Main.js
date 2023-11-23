@@ -65,6 +65,7 @@ const hashChange = async (hash) => {
   }
 
   // render page
+  window.page?.dispose();
   window.page = new Page();
 
   const response = await axios.get(`./pages/${hash}.html`).catch((err) => {

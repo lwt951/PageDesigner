@@ -823,8 +823,9 @@ body.editing {
 
 /* sidebar */
 .sidebar .nav-link.active {
-  background: #E0F3FF;
+  background: #e0f3ff;
 }
+
 /* layout */
 .layout-container {
   flex-wrap: wrap;

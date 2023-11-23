@@ -1641,6 +1641,7 @@ class Page extends Core {
     this.root = document.getElementById(config.id || 'main');
     this.source = config.source || '';
     this.container = null;
+    this.isEditing = false;
     this.nowLayoutItem = null;
     this.nowTabPane = null;
     this.designItems = {};
@@ -1702,6 +1703,23 @@ class Page extends Core {
     return this;
   }
 
+  dispose() {
+    if (this.isEditing) {
+      this.toggleEditMode(false);
+    }
+
+    this._toggleEvent(false);
+    this.toolbar?.remove();
+
+    for (const attrName in this) {
+      if (this.hasOwnProperty(attrName)) {
+        this[attrName] = null;
+      }
+    }
+
+    return null;
+  }
+
   getLayoutItemConfig(layoutItem = this.nowLayoutItem) {
     const config = {};
 
@@ -1723,6 +1741,18 @@ class Page extends Core {
     config['layout-modalId-config'] = modalId;
 
     return config;
+  }
+
+  initEditor() {
+    this._initEventHandler();
+    this._initContainer();
+    this._loadDesignEditor();
+    this._initToolbar();
+    this._initPageTitle();
+
+    this._initState = 1;
+
+    return this;
   }
 
   loadDesignHtml(
@@ -1800,28 +1830,12 @@ class Page extends Core {
     return this;
   }
 
-  toggleToolbar(isShow = true) {
-    this.toolbar.classList.toggle('d-none', !isShow);
-    return this;
-  }
-
-  async initEditor() {
-    this._initEventHandler();
-    this._initContainer();
-    this._loadDesignEditor();
-    this._initToolbar();
-    this._initPageTitle();
-
-    this._initState = 1;
-
-    return this;
-  }
-
-  async toggleEditMode(isEditing = true) {
+  toggleEditMode(isEditing = true) {
     if (!this._initState) {
-      await this.initEditor();
+      this.initEditor();
     }
 
+    this.isEditing = isEditing;
     this.toggleToolbar(isEditing);
     this._toggleEvent(isEditing);
     this._toggleNowLayoutItem(
@@ -1852,6 +1866,11 @@ class Page extends Core {
 
     document.body.classList.toggle('editing', isEditing);
 
+    return this;
+  }
+
+  toggleToolbar(isShow = true) {
+    this.toolbar.classList.toggle('d-none', !isShow);
     return this;
   }
 
@@ -2530,10 +2549,10 @@ class Page extends Core {
 
   _toggleNowTabpane(newTabpane) {
     const lastTabpane = this.nowTabPane;
-    lastTabpane?.classList.remove('editing');
+    lastTabpane?.classList?.remove('editing');
 
     this.nowTabPane = newTabpane;
-    this.nowTabPane?.classList.add('editing');
+    this.nowTabPane?.classList?.add('editing');
 
     return this;
   }
