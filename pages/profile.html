@@ -1,0 +1,43 @@
+<img
+  src="https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=0.752xw:1.00xh;0.175xw,0&resize=400:*"
+  alt=""
+  id="cropper-img"
+/>
+<button class="btn btn-primary mt-3" id="crop-button">Crop</button>
+<img
+  src=""
+  id="cropper-preview"
+  class="rounded-circle position-absolute"
+  style="width: 200px; top: 30px; left: 50px"
+/>
+
+<script>
+  const editModeSwitch = document.querySelector('.edit-mode-switch');
+  const cropBtn = document.getElementById('crop-button');
+  const imgEl = document.getElementById('cropper-img');
+
+  editModeSwitch?.classList.add('d-none');
+
+  const cropper = new Cropper(imgEl, {
+    aspectRatio: 1,
+    viewMode: 2,
+    dragMode: 'move',
+    responsive: false,
+    autoCropArea: 0.8,
+    minCropBoxWidth: 100,
+    minCropBoxHeight: 100,
+    cropBoxResizable: true,
+    toggleDragModeOnDblclick: false
+  });
+
+  cropBtn.addEventListener('click', () => {
+    const profileImgEl = document.querySelector('[alt="Profile"]');
+    const cropPreivewEl = document.getElementById('cropper-preview');
+    const croppedData = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+
+    console.log('Cropped Image Data:', croppedData);
+    
+    profileImgEl.src = croppedData;
+    cropPreivewEl.src = croppedData;
+  });
+</script>

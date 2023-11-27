@@ -1720,6 +1720,18 @@ class Page extends Core {
     return null;
   }
 
+  doBeforeSave() {
+    const forms = this.container.querySelectorAll('[data-design="form"]');
+
+    for (const form of forms) {
+      page.editors.formEditor._toggleDisabledSubmitBtn(form, false);
+    }
+
+    page.editors.tableEditor._toggleDisabledSubformBtn(false);
+
+    return this;
+  }
+
   getLayoutItemConfig(layoutItem = this.nowLayoutItem) {
     const config = {};
 
@@ -1846,10 +1858,12 @@ class Page extends Core {
     );
     this._toggleTabpaneEditing(isEditing);
     this._toggleTitleEditable(isEditing);
+    this.titleInstance?._toggleEditMode(isEditing);
 
     if (isEditing) {
       this._setDesignElSortable();
     } else {
+      this.doBeforeSave();
       this.saveLayout();
       this._handleDesignEls();
     }
@@ -1859,8 +1873,6 @@ class Page extends Core {
     for (const childEditor in this.editors) {
       this.editors[childEditor]?._toggleEditMode(isEditing);
     }
-
-    this.titleInstance?._toggleEditMode(isEditing);
 
     this._focusFirstDesignItem();
 
@@ -3373,7 +3385,7 @@ class Form extends Core {
       // If the form has a connection to a table
       if (formDataset.tableid) {
         const tableInstance = this.designItems[formDataset.tableid];
-        tableInstance.refresh();
+        tableInstance?.refresh();
       }
     };
 
@@ -5436,11 +5448,34 @@ class Menu extends Core {
     this.id = config.id;
     this.menuEditor = null;
     this.nowMenuItem = null;
+    this.saveCallback = config.saveCallback;
     this.source = config.source;
     this.toolbar = null;
     this._eventHandler = {};
 
     this._init();
+  }
+
+  click(indexOrHash = 0) {
+    const navLinks = this.el.querySelectorAll('.nav-link');
+
+    if (!isNaN(indexOrHash)) {
+      navLinks[indexOrHash]?.click();
+    } else {
+      for (const navLink of navLinks) {
+        const link = navLink
+          .getAttribute('href')
+          .replace('#', '')
+          .toLowerCase();
+        const hash = indexOrHash?.toLowerCase();
+
+        if (hash === link) {
+          navLink.click();
+        }
+      }
+    }
+
+    return this;
   }
 
   initEditor() {
@@ -5476,7 +5511,11 @@ class Menu extends Core {
       return this;
     }
 
-    this.postData(this.source, this.data);
+    this.postData(this.source, this.data).then(() => {
+      if (typeof this.saveCallback === 'function') {
+        this.saveCallback(this.data);
+      }
+    });
 
     return this;
   }
