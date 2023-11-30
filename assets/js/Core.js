@@ -337,11 +337,13 @@ class Core {
       case 'text':
       case 'number':
       case 'date':
+      case 'file':
         fieldConfig.push('input', {
           type,
           class: 'form-control field',
           name: fieldName,
-          id: fieldId
+          id: fieldId,
+          ...(type === 'file' && { disabled: 'disabled' })
         });
         break;
 
@@ -445,7 +447,8 @@ class Core {
         'radio',
         'checkbox',
         'content',
-        'treeselect'
+        'treeselect',
+        'file'
       ]
     );
     const nameInputBox = this.createFloatFieldBox(
@@ -1648,6 +1651,9 @@ class Page extends Core {
     this.editors = {};
     this.titleInstance = null;
     this.toolbar = null;
+    this.doAfterLoad = config.doAfterLoad || null;
+    this.doBeforeEdit = config.doBeforeEdit || null;
+    this.doBeforeSave = config.doBeforeSave || null;
 
     this._eventHandler = {};
     this._loadState = 0;
@@ -1720,18 +1726,6 @@ class Page extends Core {
     return null;
   }
 
-  doBeforeSave() {
-    const forms = this.container.querySelectorAll('[data-design="form"]');
-
-    for (const form of forms) {
-      page.editors.formEditor._toggleDisabledSubmitBtn(form, false);
-    }
-
-    page.editors.tableEditor._toggleDisabledSubformBtn(false);
-
-    return this;
-  }
-
   getLayoutItemConfig(layoutItem = this.nowLayoutItem) {
     const config = {};
 
@@ -1796,6 +1790,10 @@ class Page extends Core {
     }
 
     this._loadState = 1;
+
+    if (typeof this.doAfterLoad === 'function') {
+      this.doAfterLoad(this.root);
+    }
 
     return this;
   }
@@ -1862,10 +1860,23 @@ class Page extends Core {
 
     if (isEditing) {
       this._setDesignElSortable();
+
+      if (typeof this.doBeforeEdit === 'function') {
+        this.doBeforeEdit(this.root);
+      }
     } else {
-      this.doBeforeSave();
+      this._handleBeforeSave();
+
+      if (typeof this.doBeforeSave === 'function') {
+        this.doBeforeSave(this.root);
+      }
+
       this.saveLayout();
       this._handleDesignEls();
+
+      if (typeof this.doAfterLoad === 'function') {
+        this.doAfterLoad(this.root);
+      }
     }
 
     this._toggleDesignItemToModal(isEditing);
@@ -1874,6 +1885,7 @@ class Page extends Core {
       this.editors[childEditor]?._toggleEditMode(isEditing);
     }
 
+    this._handleBeforeEdit(isEditing);
     this._focusFirstDesignItem();
 
     document.body.classList.toggle('editing', isEditing);
@@ -2158,6 +2170,28 @@ class Page extends Core {
       firstDesignItem?.click();
     }
 
+    return this;
+  }
+
+  _handleBeforeSave() {
+    const forms = this.rootSelect('[data-design="form"]', true);
+
+    for (const form of forms) {
+      page.editors.formEditor._toggleDisabledSubmitBtn(form, false);
+    }
+
+    page.editors.tableEditor._toggleDisabledSubformBtn(false);
+    this._toggleFileInputDisabled(false);
+
+    return this;
+  }
+
+  _handleBeforeEdit(isEditing) {
+    if (!isEditing) {
+      return;
+    }
+
+    this._toggleFileInputDisabled(true);
     return this;
   }
 
@@ -2546,6 +2580,18 @@ class Page extends Core {
     return this;
   }
 
+  _toggleFileInputDisabled(isDisabled) {
+    const fileInputs = this.rootSelect('input[type="file"]', true);
+
+    for (const fileInput of fileInputs) {
+      if (isDisabled) {
+        fileInput.setAttribute('disabled', 'disabled');
+      } else {
+        fileInput.removeAttribute('disabled');
+      }
+    }
+  }
+
   _toggleNowLayoutItem(newLayoutItem) {
     const lastLayoutItem = this.nowLayoutItem;
     lastLayoutItem?.classList.remove('editing');
@@ -2668,9 +2714,9 @@ class FormEditor extends Core {
 
     this._toggleFormsFieldSortable(true);
 
-    // trigger focus on the new form
+    // trigger focus on the new form and it's first field
     setTimeout(() => {
-      form.click();
+      form.querySelector('.field').click();
     }, 0);
 
     return this;
@@ -3457,10 +3503,9 @@ class TableEditor extends Core {
     const tableBox = this._createTableBox();
     target.append(tableBox);
 
-    // trigger focus on the new table
+    // trigger focus on the new table and it's first field
     setTimeout(() => {
-      const table = tableBox.querySelector('table[data-design="table"]');
-      table.click();
+      tableBox.querySelector('.field').click();
     }, 0);
 
     return this;
@@ -5939,6 +5984,7 @@ class Title extends Core {
     linkInput.style.width = '100px';
     linkInput.style.height = '1.4rem';
     linkInput.classList.add('mx-1');
+
     const activeCheckbox = this.createFieldByType(
       'checkbox',
       'title-active-config',
