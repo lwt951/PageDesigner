@@ -1766,6 +1766,7 @@ class Page extends Core {
     this._loadDesignEditor();
     this._initToolbar();
     this._initPageTitle();
+    this._initScriptModal();
 
     this._initState = 1;
 
@@ -1791,10 +1792,6 @@ class Page extends Core {
       this._initContainer();
     }
 
-    for (const script of scripts) {
-      this.runScript(script);
-    }
-
     this._toggleDesignItemToModal(false);
     const designEls = document.querySelectorAll('[data-design]', true);
 
@@ -1803,7 +1800,14 @@ class Page extends Core {
     }
 
     if (loadWithEditSwitch) {
+      this._initScriptModal();
       this._initSwitchEditorBtn();
+      this._clearScriptContent();
+      this._setScriptContent(scripts[scripts.length - 1], false);
+    }
+
+    for (const script of scripts) {
+      this.runScript(script);
     }
 
     this._loadState = 1;
@@ -1833,12 +1837,19 @@ class Page extends Core {
     const layoutEl = this.root.cloneNode(true);
     const editingItems = layoutEl.querySelectorAll('.editing');
     const editModeSwitch = layoutEl.querySelector('.edit-mode-switch');
+    const oldSript = this.rootSelect('script');
+    const script = this.createEl('script');
+
+    oldSript?.remove();
+    this._setScriptContent(script);
+    this.root.append(script);
 
     for (const editingItem of editingItems) {
       editingItem.classList.remove('editing');
     }
 
     editModeSwitch?.remove();
+
     const designHtml = layoutEl.innerHTML;
 
     if (this.source) {
@@ -2137,6 +2148,18 @@ class Page extends Core {
     return this;
   }
 
+  _clearScriptContent() {
+    const scriptArea = document.getElementById('script-area');
+
+    if (!scriptArea) {
+      return;
+    }
+
+    scriptArea.value = '';
+
+    return this;
+  }
+
   _createModal(id) {
     const modalId = id || this.getOrderId('modal');
     const closeBtn = this.createEl('button', {
@@ -2340,6 +2363,32 @@ class Page extends Core {
     return this;
   }
 
+  _initScriptModal() {
+    let scriptModal = document.getElementById('script-modal');
+
+    if (scriptModal) {
+      return;
+    }
+
+    scriptModal = this._createModal('script-modal');
+    scriptModal.classList.remove('design-modal');
+
+    const modalDialog = scriptModal.querySelector('.modal-dialog')
+    const modalHeader = scriptModal.querySelector('.modal-header');
+    const modalBody = scriptModal.querySelector('.modal-body');
+    const scriptHeader = this.createEl('h3', {}, ['Script']);
+    const scriptArea = this.createFieldByType('textarea', 'Script');
+
+    modalDialog.classList.add('modal-lg')
+    modalHeader.insertBefore(scriptHeader, modalHeader.firstChild);
+    modalBody.append(scriptArea);
+    scriptArea.id = 'script-area';
+    scriptArea.style.height = '600px';
+    document.body.append(scriptModal);
+
+    return this;
+  }
+
   _initSwitchEditorBtn() {
     const switchEditorBox = this.createSwitchBox(
       'edit-mode-switch',
@@ -2455,6 +2504,22 @@ class Page extends Core {
       ['Add Tabpane']
     );
 
+    const scriptLabel = this.createEl(
+      'small',
+      { class: 'text-muted mb-1 mt-2' },
+      ['Script']
+    );
+    const addScriptBtn = this.createEl(
+      'button',
+      {
+        class: 'btn btn-primary mb-1',
+        name: 'add-script',
+        'data-bs-toggle': 'modal',
+        'data-bs-target': '#script-modal'
+      },
+      ['Script']
+    );
+
     const toolbar = this.createEl(
       'div',
       { class: 'config-toolbar card layout-toolbar d-none' },
@@ -2473,7 +2538,9 @@ class Page extends Core {
         addChartBtn,
         othersLabel,
         addTitleBtn,
-        addTabpaneBtn
+        addTabpaneBtn,
+        scriptLabel,
+        addScriptBtn
       ]
     );
 
@@ -2552,6 +2619,23 @@ class Page extends Core {
         animation: 150,
         ghostClass: 'moving'
       });
+    }
+
+    return this;
+  }
+
+  _setScriptContent(script, contentToScript = true) {
+    if (!script) {
+      return;
+    }
+
+    const scriptArea = document.getElementById('script-area');
+    const scriptContent = scriptArea?.value || '';
+
+    if (contentToScript) {
+      script.innerHTML = scriptContent;
+    } else {
+      scriptArea.value = script.innerHTML;
     }
 
     return this;
