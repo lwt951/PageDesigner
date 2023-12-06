@@ -1693,6 +1693,17 @@ class Page extends Core {
     return this;
   }
 
+  clear() {
+    const designModals = document.querySelectorAll('.design-modal')
+
+    for(const designModal of designModals) {
+      designModal.remove()
+    }
+
+    this.root.innerHTML = ''
+    return this
+  }
+
   deleteLayoutItem(layoutItem = this.nowLayoutItem) {
     if (!layoutItem) {
       console.log('element layoutitem does not exist.');
@@ -1765,6 +1776,7 @@ class Page extends Core {
     designHtml = '<div>No Data!</div>',
     loadWithEditSwitch = false
   ) {
+    this.clear()
     this.root.innerHTML = designHtml;
     this.container = this.rootSelect('.layout-container');
 
@@ -1779,7 +1791,7 @@ class Page extends Core {
     }
 
     this._toggleDesignItemToModal(false);
-    const designEls = this.rootSelect('[data-design]', true);
+    const designEls = document.querySelectorAll('[data-design]', true);
 
     for (const designEl of designEls) {
       this._initDesignItem(designEl);
