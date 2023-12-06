@@ -1,11 +1,13 @@
-<div>
-  <div id="signature-pad">
-    <canvas class="border" id="signature"></canvas>
+<template>
+  <div>
+    <div id="signature-pad">
+      <canvas class="border" id="signature"></canvas>
+    </div>
+    <button class="btn btn-primary mt-3" id="save-sign">Save</button>
+    <button class="btn btn-warning mt-3" id="undo-sign">Undo</button>
+    <button class="btn btn-danger mt-3" id="clear-sign">Clear</button>
   </div>
-  <button class="btn btn-primary mt-3" id="save-sign">Save</button>
-  <button class="btn btn-warning mt-3" id="undo-sign">Undo</button>
-  <button class="btn btn-danger mt-3" id="clear-sign">Clear</button>
-</div>
+</template>
 
 <script>
   offEditMode();

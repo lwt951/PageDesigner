@@ -1694,14 +1694,14 @@ class Page extends Core {
   }
 
   clear() {
-    const designModals = document.querySelectorAll('.design-modal')
+    const designModals = document.querySelectorAll('.design-modal');
 
-    for(const designModal of designModals) {
-      designModal.remove()
+    for (const designModal of designModals) {
+      designModal.remove();
     }
 
-    this.root.innerHTML = ''
-    return this
+    this.root.innerHTML = '';
+    return this;
   }
 
   deleteLayoutItem(layoutItem = this.nowLayoutItem) {
@@ -1776,15 +1776,20 @@ class Page extends Core {
     designHtml = '<div>No Data!</div>',
     loadWithEditSwitch = false
   ) {
-    this.clear()
+    this.clear();
     this.root.innerHTML = designHtml;
+    const template = this.rootSelect('template');
+    const scripts = this.rootSelect('script', true);
+
+    if (template) {
+      this.root.innerHTML = template.innerHTML;
+    }
+
     this.container = this.rootSelect('.layout-container');
 
     if (!this.container) {
       this._initContainer();
     }
-
-    const scripts = this.root.querySelectorAll('script');
 
     for (const script of scripts) {
       this.runScript(script);
