@@ -1,0 +1,43 @@
+<div>
+  <div id="signature-pad">
+    <canvas class="border" id="signature"></canvas>
+  </div>
+  <button class="btn btn-primary mt-3" id="save-sign">Save</button>
+  <button class="btn btn-warning mt-3" id="undo-sign">Undo</button>
+  <button class="btn btn-danger mt-3" id="clear-sign">Clear</button>
+</div>
+
+<script>
+  offEditMode();
+
+  const canvas = document.getElementById('signature');
+  const saveBtn = document.getElementById('save-sign');
+  const undoBtn = document.getElementById('undo-sign');
+  const clearBtn = document.getElementById('clear-sign');
+
+  window.signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'rgb(255, 255, 255)',
+    penColor: 'black'
+  });
+
+  saveBtn.addEventListener('click', function () {
+    const svg = signaturePad.toSVG();
+
+    console.log(svg);
+  });
+
+  undoBtn.addEventListener('click', function () {
+    const data = signaturePad.toData();
+
+    if (!data) {
+      return;
+    }
+
+    data.pop(); // remove the last dot or line
+    signaturePad.fromData(data);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    signaturePad.clear();
+  });
+</script>

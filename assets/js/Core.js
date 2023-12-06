@@ -1815,11 +1815,13 @@ class Page extends Core {
   saveLayout() {
     const layoutEl = this.root.cloneNode(true);
     const editingItems = layoutEl.querySelectorAll('.editing');
+    const editModeSwitch = layoutEl.querySelector('.edit-mode-switch');
 
     for (const editingItem of editingItems) {
       editingItem.classList.remove('editing');
     }
 
+    editModeSwitch?.remove();
     const designHtml = layoutEl.innerHTML;
 
     if (this.source) {
@@ -2328,15 +2330,16 @@ class Page extends Core {
     );
     const switchInput = switchEditorBox.querySelector('input');
 
-    switchEditorBox.classList.add('position-fixed', 'edit-mode-switch');
-    switchEditorBox.style.top = '100px';
-    switchEditorBox.style.right = '50px';
+    switchEditorBox.classList.add('position-absolute', 'edit-mode-switch');
+    switchEditorBox.style.zIndex = '9999';
+    switchEditorBox.style.top = '15px';
+    switchEditorBox.style.right = '15px';
 
     switchInput.addEventListener('change', () => {
       this.toggleEditMode(switchInput.checked);
     });
 
-    document.body.append(switchEditorBox);
+    this.root.append(switchEditorBox);
 
     return this;
   }
@@ -2539,7 +2542,7 @@ class Page extends Core {
 
   _toggleDesignItemToModal(isEditing) {
     if (isEditing) {
-      const designItemModals = this.rootSelect('.design-modal', true);
+      const designItemModals = document.querySelectorAll('.design-modal');
 
       for (const designItemModal of designItemModals) {
         const designItem = designItemModal.querySelector('.layout-item');
@@ -2555,7 +2558,7 @@ class Page extends Core {
         const modalBody = newModal.querySelector('.modal-body');
 
         modalBody.append(modalDesignItem);
-        this.container.append(newModal);
+        document.body.append(newModal);
 
         this._bindModalEvent(newModal);
       }
@@ -3833,7 +3836,7 @@ class TableEditor extends Core {
       'table',
       {
         id,
-        class: 'table table-striped w-100',
+        class: 'table w-100',
         'data-design': 'table',
         'data-idKey': 'idno',
         'data-filter': true,
@@ -5648,7 +5651,7 @@ class Menu extends Core {
 
       if (item.children?.length) {
         const downIconEl = this.createEl('i', {
-          class: 'bi bi-chevron-down ms-auto'
+          class: 'bi bi-chevron-right ms-auto'
         });
         const childUlEl = this.createEl('ul', {
           id: childUlid,

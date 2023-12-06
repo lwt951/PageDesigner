@@ -1,14 +1,27 @@
 'use strict';
 
+// off editmode function
+function offEditMode() {
+  const editModeSwitch = document.querySelector('.edit-mode-switch');
+  editModeSwitch?.classList.add('d-none');
+}
+
 // toggle side bar button
-const toggleSidebarBtn = document.querySelector('.toggle-sidebar-btn');
-toggleSidebarBtn?.addEventListener('click', () => {
-  document.body.classList.toggle('toggle-sidebar');
+const sidebar = document.querySelector('.sidebar');
+const openSidebarBtn = document.querySelector('.sidebar-icon');
+const closeSidebarBtn = document.querySelector('.sidebar-close-icon');
+
+openSidebarBtn?.addEventListener('click', () => {
   const menuEditorSwitch = document.querySelector('[name="menu-edit-config"]');
+
+  sidebar?.classList.add('active-sidebar');
 
   if (menuEditorSwitch.checked) {
     menuEditorSwitch.click();
   }
+});
+closeSidebarBtn.addEventListener('click', () => {
+  sidebar?.classList.remove('active-sidebar');
 });
 
 // back to top button
