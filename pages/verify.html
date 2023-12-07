@@ -56,7 +56,7 @@
   // VerifyCode Class
   class VerifyCode {
     constructor(config) {
-      this.code = config.code || this.getRandom();
+      this.code = config.code || this.getRandomCode();
       this.canvas = document.getElementById(config.id);
       this.bgColor1 = config.bgColor1 || 180;
       this.bgColor2 = config.bgColor2 || 255;
@@ -72,6 +72,20 @@
 
     getRandom(min = 100000, max = 999999) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    getRandomCode() {
+      const str =
+        '123456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789';
+      const strArray = str.split('');
+      let randomCode = '';
+
+      for (let i = 0; i < 6; i++) {
+        const randomIndex = this.getRandom(0, str.length - 1);
+        randomCode += strArray[randomIndex];
+      }
+
+      return randomCode;
     }
 
     getRandomColor(min, max) {
@@ -94,7 +108,7 @@
     }
 
     reload() {
-      this.code = this.getRandom();
+      this.code = this.getRandomCode();
       this.renderCanvas();
 
       return this;
@@ -113,7 +127,7 @@
     }
 
     validate(code) {
-      return this.code == code;
+      return this.code?.toLowerCase() == code?.toLowerCase();
     }
 
     _renderCode() {
