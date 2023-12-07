@@ -1792,6 +1792,8 @@ class Page extends Core {
   ) {
     this.clear();
     this.root.innerHTML = designHtml;
+    this.togglePageTransition(false);
+
     const template = this.rootSelect('template');
     const scripts = this.rootSelect('script', true);
     const styles = this.rootSelect('style', true);
@@ -1837,6 +1839,10 @@ class Page extends Core {
     if (typeof this.doAfterLoad === 'function') {
       this.doAfterLoad(this.root);
     }
+
+    setTimeout(() => {
+      this.togglePageTransition(true);
+    }, 300);
 
     return this;
   }
@@ -1947,6 +1953,12 @@ class Page extends Core {
     this._focusFirstDesignItem();
 
     document.body.classList.toggle('editing', isEditing);
+
+    return this;
+  }
+
+  togglePageTransition(isLoad) {
+    this.root?.classList.toggle('page-transition', !isLoad);
 
     return this;
   }
