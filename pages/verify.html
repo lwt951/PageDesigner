@@ -4,18 +4,25 @@
     data-bs-toggle="modal"
     data-bs-target="#script-modal"
   >
-    show script
+    Show script
+  </button>
+  <button
+    class="btn btn-sm btn-outline-primary float-end mt-3 mx-3"
+    data-bs-toggle="modal"
+    data-bs-target="#style-modal"
+  >
+    Show style
   </button>
 
   <div id="verify-box" class="d-inline-block">
-    <h4 id="verify-code">Verification Code</h4>
+    <h4 id="verify-code" class="mb-4">Verification Code</h4>
 
     <div class="input-group mb-3">
       <input
         id="valid-text"
-        class="form-control col-3"
+        class="form-control col-3 border shadow-0"
         type="text"
-        placeholder="Please enter the verification code"
+        placeholder="Please enter the code"
       />
       <span
         class="input-group-text fail-text bg-danger text-light d-none"
@@ -30,9 +37,14 @@
       ></span>
     </div>
 
-    <canvas id="verify-canvas" width="200" height="50"></canvas>
+    <canvas
+      id="verify-canvas"
+      class="border rounded"
+      width="200"
+      height="50"
+    ></canvas>
 
-    <button id="reload-btn" class="btn btn-sm btn-primary rounded-pill mb-4">
+    <button id="reload-btn" class="btn btn-sm btn-primary mb-4">
       <i class="bi bi-arrow-repeat"></i>
     </button>
   </div>
@@ -40,6 +52,7 @@
 
 <script>
   offEditMode();
+
   // VerifyCode Class
   class VerifyCode {
     constructor(config) {
@@ -194,3 +207,10 @@
     failBadge.classList.toggle('d-none', isVaild);
   });
 </script>
+
+<style>
+  :root {
+    --bs-success-rgb: 32, 201, 151;
+    --bs-danger-rgb: 255, 88, 88;
+  }
+</style>

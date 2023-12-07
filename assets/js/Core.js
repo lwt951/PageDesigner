@@ -1207,6 +1207,21 @@ class Core {
     return this;
   }
 
+  runStyle(style) {
+    const newStyle = document.createElement('style');
+    const src = style.getAttribute('src');
+
+    newStyle.innerHTML = style.innerHTML;
+
+    if (src) {
+      newStyle.setAttribute('src', src);
+    }
+
+    document.body.appendChild(newStyle);
+
+    return newStyle;
+  }
+
   setBsTooltip() {
     if (!bootstrap) {
       console.warn('bootstrap does not exist!');
@@ -1694,13 +1709,10 @@ class Page extends Core {
   }
 
   clear() {
-    const designModals = document.querySelectorAll('.design-modal');
-
-    for (const designModal of designModals) {
-      designModal.remove();
-    }
-
+    this._removeDesignModal();
+    this._removeCustomStyle();
     this.root.innerHTML = '';
+
     return this;
   }
 
@@ -1767,6 +1779,7 @@ class Page extends Core {
     this._initToolbar();
     this._initPageTitle();
     this._initScriptModal();
+    this._initStyleModal();
 
     this._initState = 1;
 
@@ -1781,6 +1794,7 @@ class Page extends Core {
     this.root.innerHTML = designHtml;
     const template = this.rootSelect('template');
     const scripts = this.rootSelect('script', true);
+    const styles = this.rootSelect('style', true);
 
     if (template) {
       this.root.innerHTML = template.innerHTML;
@@ -1801,13 +1815,21 @@ class Page extends Core {
 
     if (loadWithEditSwitch) {
       this._initScriptModal();
+      this._initStyleModal();
       this._initSwitchEditorBtn();
       this._clearScriptContent();
+      this._clearStyleContent();
       this._setScriptContent(scripts[scripts.length - 1], false);
+      this._setStyleContent(styles[styles.length - 1], false);
     }
 
     for (const script of scripts) {
       this.runScript(script);
+    }
+
+    for (const style of styles) {
+      const newStyle = this.runStyle(style);
+      newStyle.dataset.custom = true;
     }
 
     this._loadState = 1;
@@ -1838,11 +1860,16 @@ class Page extends Core {
     const editingItems = layoutEl.querySelectorAll('.editing');
     const editModeSwitch = layoutEl.querySelector('.edit-mode-switch');
     const oldSript = this.rootSelect('script');
+    const oldStyle = this.rootSelect('style');
     const script = this.createEl('script');
+    const style = this.createEl('style');
 
     oldSript?.remove();
+    oldStyle?.remove();
     this._setScriptContent(script);
+    this._setStyleContent(style);
     this.root.append(script);
+    this.root.append(style);
 
     for (const editingItem of editingItems) {
       editingItem.classList.remove('editing');
@@ -1901,6 +1928,7 @@ class Page extends Core {
         this.doBeforeSave(this.root);
       }
 
+      this._removeCustomStyle();
       this.saveLayout();
       this._handleDesignEls();
 
@@ -2160,6 +2188,18 @@ class Page extends Core {
     return this;
   }
 
+  _clearStyleContent() {
+    const styleArea = document.getElementById('style-area');
+
+    if (!styleArea) {
+      return;
+    }
+
+    styleArea.value = '';
+
+    return this;
+  }
+
   _createModal(id) {
     const modalId = id || this.getOrderId('modal');
     const closeBtn = this.createEl('button', {
@@ -2373,18 +2413,44 @@ class Page extends Core {
     scriptModal = this._createModal('script-modal');
     scriptModal.classList.remove('design-modal');
 
-    const modalDialog = scriptModal.querySelector('.modal-dialog')
+    const modalDialog = scriptModal.querySelector('.modal-dialog');
     const modalHeader = scriptModal.querySelector('.modal-header');
     const modalBody = scriptModal.querySelector('.modal-body');
     const scriptHeader = this.createEl('h3', {}, ['Script']);
     const scriptArea = this.createFieldByType('textarea', 'Script');
 
-    modalDialog.classList.add('modal-lg')
+    modalDialog.classList.add('modal-lg');
     modalHeader.insertBefore(scriptHeader, modalHeader.firstChild);
     modalBody.append(scriptArea);
     scriptArea.id = 'script-area';
     scriptArea.style.height = '600px';
     document.body.append(scriptModal);
+
+    return this;
+  }
+
+  _initStyleModal() {
+    let styleModal = document.getElementById('style-modal');
+
+    if (styleModal) {
+      return;
+    }
+
+    styleModal = this._createModal('style-modal');
+    styleModal.classList.remove('design-modal');
+
+    const modalDialog = styleModal.querySelector('.modal-dialog');
+    const modalHeader = styleModal.querySelector('.modal-header');
+    const modalBody = styleModal.querySelector('.modal-body');
+    const styleHeader = this.createEl('h3', {}, ['Style']);
+    const styleArea = this.createFieldByType('textarea', 'Style');
+
+    modalDialog.classList.add('modal-lg');
+    modalHeader.insertBefore(styleHeader, modalHeader.firstChild);
+    modalBody.append(styleArea);
+    styleArea.id = 'style-area';
+    styleArea.style.height = '600px';
+    document.body.append(styleModal);
 
     return this;
   }
@@ -2507,7 +2573,7 @@ class Page extends Core {
     const scriptLabel = this.createEl(
       'small',
       { class: 'text-muted mb-1 mt-2' },
-      ['Script']
+      ['Script & Style']
     );
     const addScriptBtn = this.createEl(
       'button',
@@ -2518,6 +2584,17 @@ class Page extends Core {
         'data-bs-target': '#script-modal'
       },
       ['Script']
+    );
+
+    const addStyleBtn = this.createEl(
+      'button',
+      {
+        class: 'btn btn-primary mb-1',
+        name: 'add-style',
+        'data-bs-toggle': 'modal',
+        'data-bs-target': '#style-modal'
+      },
+      ['Style']
     );
 
     const toolbar = this.createEl(
@@ -2540,7 +2617,8 @@ class Page extends Core {
         addTitleBtn,
         addTabpaneBtn,
         scriptLabel,
-        addScriptBtn
+        addScriptBtn,
+        addStyleBtn
       ]
     );
 
@@ -2563,6 +2641,26 @@ class Page extends Core {
         container: this.container,
         designItems: this.designItems
       });
+    }
+
+    return this;
+  }
+
+  _removeCustomStyle() {
+    const customStyles = document.querySelectorAll('style[data-custom="true"]');
+
+    for (const customStyle of customStyles) {
+      customStyle.remove();
+    }
+
+    return this;
+  }
+
+  _removeDesignModal() {
+    const designModals = document.querySelectorAll('.design-modal');
+
+    for (const designModal of designModals) {
+      designModal.remove();
     }
 
     return this;
@@ -2636,6 +2734,23 @@ class Page extends Core {
       script.innerHTML = scriptContent;
     } else {
       scriptArea.value = script.innerHTML;
+    }
+
+    return this;
+  }
+
+  _setStyleContent(style, contentToStyle = true) {
+    if (!style) {
+      return;
+    }
+
+    const styleArea = document.getElementById('style-area');
+    const styleContent = styleArea?.value || '';
+
+    if (contentToStyle) {
+      style.innerHTML = styleContent;
+    } else {
+      styleArea.value = style.innerHTML;
     }
 
     return this;
