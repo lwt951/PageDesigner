@@ -1,11 +1,20 @@
 <template>
   <div>
+    <button
+      class="btn btn-sm btn-outline-primary float-end"
+      data-bs-toggle="modal"
+      data-bs-target="#script-modal"
+    >
+      show script
+    </button>
     <div id="signature-pad">
       <canvas class="border" id="signature"></canvas>
     </div>
     <button class="btn btn-primary mt-3" id="save-sign">Save</button>
     <button class="btn btn-warning mt-3" id="undo-sign">Undo</button>
     <button class="btn btn-danger mt-3" id="clear-sign">Clear</button>
+    <h5 class="mt-3">Preview:</h5>
+    <div id="signature-preview"></div>
   </div>
 </template>
 
@@ -23,9 +32,11 @@
   });
 
   saveBtn.addEventListener('click', function () {
+    const signaturePreview = document.getElementById('signature-preview');
     const svg = signaturePad.toSVG();
 
     console.log(svg);
+    signaturePreview.innerHTML = svg;
   });
 
   undoBtn.addEventListener('click', function () {

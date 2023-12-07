@@ -1,0 +1,196 @@
+<template>
+  <button
+    class="btn btn-sm btn-outline-primary float-end mt-3"
+    data-bs-toggle="modal"
+    data-bs-target="#script-modal"
+  >
+    show script
+  </button>
+
+  <div id="verify-box" class="d-inline-block">
+    <h4 id="verify-code">Verification Code</h4>
+
+    <div class="input-group mb-3">
+      <input
+        id="valid-text"
+        class="form-control col-3"
+        type="text"
+        placeholder="Please enter the verification code"
+      />
+      <span
+        class="input-group-text fail-text bg-danger text-light d-none"
+        style="
+          border-top-right-radius: 0.375rem !important;
+          border-bottom-right-radius: 0.375rem !important;
+        "
+        ><i class="bi bi-x"></i
+      ></span>
+      <span class="input-group-text ok-text bg-success text-light d-none"
+        ><i class="bi bi-check"></i
+      ></span>
+    </div>
+
+    <canvas id="verify-canvas" width="200" height="50"></canvas>
+
+    <button id="reload-btn" class="btn btn-sm btn-primary rounded-pill mb-4">
+      <i class="bi bi-arrow-repeat"></i>
+    </button>
+  </div>
+</template>
+
+<script>
+  offEditMode();
+  // VerifyCode Class
+  class VerifyCode {
+    constructor(config) {
+      this.code = config.code || this.getRandom();
+      this.canvas = document.getElementById(config.id);
+      this.bgColor1 = config.bgColor1 || 180;
+      this.bgColor2 = config.bgColor2 || 255;
+      this.fontColor1 = config.fontColor1 || 0;
+      this.fontColor2 = config.fontColor2 || 50;
+      this.fontStyle = config.fontStyle || '24px SimHei';
+      this.width = config.width || 200;
+      this.height = config.height || 50;
+      this.canvasObj = null;
+
+      this.init();
+    }
+
+    getRandom(min = 100000, max = 999999) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    getRandomColor(min, max) {
+      const red = this.getRandom(min, max);
+      const green = this.getRandom(min, max);
+      const blue = this.getRandom(min, max);
+
+      return `rgb(${red},${green},${blue})`;
+    }
+
+    init() {
+      if (!this.canvas) {
+        throw new Error('element Canvas does not exist!');
+      }
+
+      this.canvasObj = this.canvas.getContext('2d');
+      this.renderCanvas();
+
+      return this;
+    }
+
+    reload() {
+      this.code = this.getRandom();
+      this.renderCanvas();
+
+      return this;
+    }
+
+    renderCanvas() {
+      const { bgColor1, bgColor2, canvasObj, width, height } = this;
+
+      canvasObj.textBaseline = 'middle';
+      canvasObj.fillStyle = this.getRandomColor(bgColor1, bgColor2);
+      canvasObj.fillRect(0, 0, width, height);
+
+      this._renderCode();
+
+      return this;
+    }
+
+    validate(code) {
+      return this.code == code;
+    }
+
+    _renderCode() {
+      const {
+        canvasObj,
+        code,
+        fontColor1,
+        fontColor2,
+        fontStyle,
+        height,
+        width
+      } = this;
+      const codeStr = code.toString();
+
+      for (let i = 0; i < codeStr.length; i++) {
+        const char = codeStr.charAt(i); // Make each word unique
+
+        canvasObj.font = fontStyle;
+        canvasObj.fillStyle = this.getRandomColor(fontColor1, fontColor2);
+        canvasObj.shadowOffsetY = this.getRandom(-3, 3);
+        canvasObj.shadowBlur = this.getRandom(-3, 3);
+        canvasObj.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
+        // Char rotation angle
+        const x = (width / (codeStr.length + 1)) * (i + 1);
+        const y = height / 2;
+        const deg = this.getRandom(-30, 30);
+        // Start rotation
+        canvasObj.translate(x, y);
+        canvasObj.rotate((deg * Math.PI) / 180);
+        canvasObj.fillText(char, 0, 0);
+        // After rotating back to the origin.
+        canvasObj.rotate((-deg * Math.PI) / 180);
+        canvasObj.translate(-x, -y);
+      }
+
+      this._renderInterference();
+
+      return this;
+    }
+
+    _renderInterference() {
+      const { canvasObj, height, width, getRandom } = this;
+
+      // 1~4 Interference line
+      for (let i = 0; i < getRandom(1, 4); i++) {
+        canvasObj.strokeStyle = this.getRandomColor(40, 180);
+        canvasObj.beginPath();
+        canvasObj.moveTo(getRandom(0, width), getRandom(0, height));
+        canvasObj.lineTo(getRandom(0, width), getRandom(0, height));
+        canvasObj.stroke();
+      }
+
+      // Interference point
+      for (let i = 0; i < width / 6; i++) {
+        canvasObj.fillStyle = this.getRandomColor(0, 255);
+        canvasObj.beginPath();
+        canvasObj.arc(
+          getRandom(0, width),
+          getRandom(0, height),
+          1,
+          0,
+          2 * Math.PI
+        );
+        canvasObj.fill();
+      }
+    }
+  }
+
+  const verifyBox = document.getElementById('verify-box');
+  const verifyInput = verifyBox.querySelector('#valid-text');
+  const okBadge = verifyBox.querySelector('.ok-text');
+  const failBadge = verifyBox.querySelector('.fail-text');
+  const reloadBtn = document.getElementById('reload-btn');
+
+  const verifyObj = new VerifyCode({
+    id: 'verify-canvas'
+  });
+
+  reloadBtn.addEventListener('click', () => {
+    verifyObj.reload();
+    okBadge.classList.add('d-none');
+    failBadge.classList.add('d-none');
+    verifyInput.value = '';
+  });
+
+  verifyInput.addEventListener('input', function () {
+    const isVaild = verifyObj.validate(this.value);
+
+    okBadge.classList.toggle('d-none', !isVaild);
+    failBadge.classList.toggle('d-none', isVaild);
+  });
+</script>
