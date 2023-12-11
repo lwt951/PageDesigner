@@ -1191,15 +1191,21 @@ class Core {
   }
 
   runScript(script) {
-    const newScript = document.createElement('script');
-    const src = script.getAttribute('src');
-
-    newScript.innerHTML = script.innerHTML;
-    newScript.setAttribute('type', 'module');
-
-    if (src) {
-      newScript.setAttribute('src', src);
+    if (script instanceof HTMLScriptElement !== true) {
+      return;
     }
+
+    const scriptAttrArr = Array.from(script.attributes);
+    const scriptAttrObj = {};
+
+    for (const attrObj of scriptAttrArr) {
+      const { name, value } = attrObj;
+      scriptAttrObj[name] = value;
+    }
+
+    const newScript = this.createEl('script', scriptAttrObj, [
+      script.innerHTML
+    ]);
 
     document.body.appendChild(newScript);
     document.body.removeChild(newScript);

@@ -48,16 +48,29 @@
       <i class="bi bi-arrow-repeat"></i>
     </button>
   </div>
-</template>
 
+  <hr>
+  <!-- test reCAPTCHA v2 -->
+  <h4>reCAPTCHA</h4>
+  <div class="g-recaptcha" data-sitekey="6LeZKS0pAAAAAHByZZ-oLjLNpwgIRmWPJLF0JdIF" data-callback="verifyCallback"></div>
+</template>
 <script>
+  window.verifyCallback = () =>{
+        alert('Success');
+      };
+</script>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+  function onSubmit(token) {
+     document.getElementById("demo-form").submit();
+   }
   offEditMode();
 
   // VerifyCode Class
   class VerifyCode {
     constructor(config) {
       this.code = config.code || this.getRandomCode();
-      this.canvas = document.getElementById(config.id);
+      this.canvas = config.el || document.getElementById(config.id);
       this.bgColor1 = config.bgColor1 || 180;
       this.bgColor2 = config.bgColor2 || 255;
       this.fontColor1 = config.fontColor1 || 0;
