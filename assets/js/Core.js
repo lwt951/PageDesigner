@@ -1196,11 +1196,15 @@ class Core {
     }
 
     const scriptAttrArr = Array.from(script.attributes);
-    const scriptAttrObj = {};
+    const scriptAttrObj = { type: 'module' };
 
     for (const attrObj of scriptAttrArr) {
       const { name, value } = attrObj;
       scriptAttrObj[name] = value;
+
+      if (name === 'src' && value.indexOf('http') > -1) {
+        delete scriptAttrObj.type;
+      }
     }
 
     const newScript = this.createEl('script', scriptAttrObj, [
