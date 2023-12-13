@@ -49,21 +49,23 @@
     </button>
   </div>
 
-  <hr>
+  <hr />
   <!-- test reCAPTCHA v2 -->
   <h4>reCAPTCHA</h4>
-  <div class="g-recaptcha" data-sitekey="6LeZKS0pAAAAAHByZZ-oLjLNpwgIRmWPJLF0JdIF" data-callback="verifyCallback"></div>
+  <div
+    class="g-recaptcha"
+    data-sitekey="6LeZKS0pAAAAAHByZZ-oLjLNpwgIRmWPJLF0JdIF"
+    data-callback="verifyCallback"
+  ></div>
 </template>
+
 <script>
-  window.verifyCallback = () =>{
-        alert('Success');
-      };
+  window.verifyCallback = () => {
+    alert('Success');
+  };
 </script>
 <script src="https://www.google.com/recaptcha/api.js?hl=en"></script>
 <script>
-  function onSubmit(token) {
-     document.getElementById("demo-form").submit();
-   }
   offEditMode();
 
   // VerifyCode Class

@@ -1094,6 +1094,7 @@ body.editing .chart-box.editing [data-design] {
 .table.editing,
 .form.editing,
 .chart-box.editing {
+  border-radius: 0.375rem;
   box-shadow: rgb(251 165 6 / 33%) 0px 0px 0px 3px;
 }
 
@@ -1250,8 +1251,9 @@ th.editing {
 }
 
 .breadcrumb-item.editing a {
-  border: 2px solid black;
-  border-radius: 2px;
+  box-shadow: rgb(203 74 201 / 30%) 0px 0px 0px 3px;
+  border-radius: 0.375rem;
+  padding: 0.3em;
 }
 
 /* drag */
@@ -1259,6 +1261,17 @@ th.editing {
   background: #fffda07a !important;
   box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px,
     rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+}
+
+/* contenteditable */
+body.editing [contenteditable='true']:focus,
+body.editing [contenteditable='plaintext-only']:focus {
+  border: none !important; 
+  border-radius: 0.375rem;
+  box-shadow: rgb(203 74 201 / 30%) 0px 0px 0px 3px !important;
+  font-weight: 900;
+  outline: none !important; 
+  padding: 0.3em;
 }
 
 /* page transition */

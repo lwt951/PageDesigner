@@ -2877,7 +2877,9 @@ class Page extends Core {
   }
 
   _toggleTitleEditable(isEditable = true) {
-    const titles = this.rootSelect('.card-title', true);
+    const designModalsTitles = document.querySelectorAll('.design-modal .card-title');
+    const rootTitles = this.rootSelect('.card-title', true);
+    const titles = [...new Set([...designModalsTitles, ...rootTitles])];
 
     for (const title of titles) {
       title.setAttribute(
