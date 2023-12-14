@@ -5882,10 +5882,10 @@ class Menu extends Core {
         [iconEl, textEl]
       );
 
-      if (item.href) {
-        delete aEl.dataset.bsTarget;
-        delete aEl.dataset.bsToggle;
-      }
+      // if (item.href) {
+      //   delete aEl.dataset.bsTarget;
+      //   delete aEl.dataset.bsToggle;
+      // }
 
       const liEl = this.createEl('li', { class: 'nav-item' }, [aEl]);
 

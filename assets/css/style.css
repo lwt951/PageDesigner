@@ -1264,6 +1264,10 @@ th.editing {
 }
 
 /* contenteditable */
+body.editing [contenteditable='true'],
+body.editing [contenteditable='plaintext-only'] {
+  cursor: pointer;
+}
 body.editing [contenteditable='true']:focus,
 body.editing [contenteditable='plaintext-only']:focus {
   border: none !important; 
