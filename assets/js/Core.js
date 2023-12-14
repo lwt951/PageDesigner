@@ -2877,7 +2877,9 @@ class Page extends Core {
   }
 
   _toggleTitleEditable(isEditable = true) {
-    const designModalsTitles = document.querySelectorAll('.design-modal .card-title');
+    const designModalsTitles = document.querySelectorAll(
+      '.design-modal .card-title'
+    );
     const rootTitles = this.rootSelect('.card-title', true);
     const titles = [...new Set([...designModalsTitles, ...rootTitles])];
 
@@ -3885,27 +3887,34 @@ class TableEditor extends Core {
       this._setColRowLength(this.nowTable, rowsConfigInput.value, 'row');
     });
 
+    // switch part
     const tableFilterSwitch = toolbar.querySelector(
       '[name="table-filter-config"]'
     );
-    tableFilterSwitch.addEventListener('change', () => {
-      if (!this.nowTable) {
-        return;
-      }
-
-      this.nowTable.dataset.filter = tableFilterSwitch.checked;
-    });
-
     const tablePaginationSwitch = toolbar.querySelector(
       '[name="table-pagination-config"]'
     );
-    tablePaginationSwitch.addEventListener('change', () => {
-      if (!this.nowTable) {
-        return;
-      }
+    const autoBuildSwitch = toolbar.querySelector(
+      '[name="table-autobuild-config"]'
+    );
 
-      this.nowTable.dataset.pagination = tablePaginationSwitch.checked;
-    });
+    const switchObj = {
+      filter: tableFilterSwitch,
+      pagination: tablePaginationSwitch,
+      autobuild: autoBuildSwitch
+    };
+
+    for (const datasetName in switchObj) {
+      const switchEl = switchObj[datasetName];
+
+      switchEl.addEventListener('change', () => {
+        if (!this.nowTable) {
+          return;
+        }
+
+        this.nowTable.dataset[datasetName] = switchEl.checked;
+      });
+    }
 
     bindSwitchAndInputDateset('addBtn', 'addLink', 'add');
     bindSwitchAndInputDateset('addByModal', 'addModalId', 'modaladd');
@@ -4081,6 +4090,7 @@ class TableEditor extends Core {
         'data-idKey': 'idno',
         'data-filter': true,
         'data-pagination': true,
+        'data-autobuild': false,
         'data-type': 'table',
         'data-source': ''
       },
@@ -4184,6 +4194,10 @@ class TableEditor extends Core {
       'table-pagination-config',
       'Pagination'
     );
+    const autoBuildSwitchBox = this.createSwitchBox(
+      'table-autobuild-config',
+      'Auto Build'
+    );
 
     const deleteTableBtn = this.createEl(
       'button',
@@ -4206,6 +4220,7 @@ class TableEditor extends Core {
         rowColBox,
         filterSwitchBox,
         paginationSwitchBox,
+        autoBuildSwitchBox,
         deleteTableBtn
       ]
     );
@@ -4282,6 +4297,8 @@ class TableEditor extends Core {
     const filterSwitchValue = table.dataset.filter == 'true' ? true : false;
     const paginationSwitchValue =
       table.dataset.pagination == 'true' ? true : false;
+    const autoBuildSwitchValue =
+      table.dataset.autobuild == 'true' ? true : false;
     const colLength = firstRow.querySelectorAll(
       'td:not(.delete-row-box)'
     ).length;
@@ -4295,6 +4312,7 @@ class TableEditor extends Core {
     tableConfig['table-rows-config'] = rowLength;
     tableConfig['table-filter-config'] = filterSwitchValue;
     tableConfig['table-pagination-config'] = paginationSwitchValue;
+    tableConfig['table-autobuild-config'] = autoBuildSwitchValue;
 
     return tableConfig;
   }
@@ -4574,7 +4592,13 @@ class TableEditor extends Core {
       '[name="table-type-config"]'
     ).value;
     const tableConfigBox = this.toolbar.querySelector('.table-config-box');
-    const tableConfigNames = ['source', 'rows', 'filter', 'pagination'];
+    const tableConfigNames = [
+      'source',
+      'rows',
+      'filter',
+      'pagination',
+      'autobuild'
+    ];
     const isHidden = tableType === 'table';
 
     for (const configName of tableConfigNames) {
@@ -4665,6 +4689,7 @@ class Table extends Core {
     this.data = [];
     this.source = config.source;
     this.dataIdKey = config.dataIdKey;
+    this.isAutoBuild = null;
     this.tableBackup = null;
     this.dataTable = null;
     this.designItems = config.designItems || {};
@@ -4686,15 +4711,17 @@ class Table extends Core {
   }
 
   getDataTableConfig() {
-    const columnsConfig = this._getColumnsConfig();
+    const columnsConfig = this.isAutoBuild
+      ? this._getAutoBuildColumns()
+      : this._getColumnsConfig();
     const tableDomConfig = this._getTableDomConfig();
-    const tableBtnCindig = this._getTableBtnConfig();
+    const tableBtnConfig = this._getTableBtnConfig();
 
     const dataTableConfig = {
       data: this.data,
       columns: columnsConfig,
       dom: tableDomConfig,
-      buttons: tableBtnCindig,
+      buttons: tableBtnConfig,
       pageResize: true
     };
 
@@ -4733,6 +4760,11 @@ class Table extends Core {
   renderDataTable() {
     const dataTableConfig = this.getDataTableConfig();
     this._backupTable();
+
+    if (this.isAutoBuild) {
+      this.el.innerHTML = '';
+    }
+
     this.dataTable?.destroy();
     this.dataTable = new DataTable(`#${this.id}`, dataTableConfig);
     this.buildTreeselects(this.el);
@@ -4774,6 +4806,7 @@ class Table extends Core {
     this.data = this.source
       ? await this.getData(this.source)
       : this.getPreviewData();
+    this.isAutoBuild = this.el.dataset.autobuild === 'true' ? true : false;
 
     for (const designName in this.designItems) {
       if (this.designItems[designName] === this) {
@@ -4875,6 +4908,22 @@ class Table extends Core {
         return renderBox.innerHTML;
       }
     };
+  }
+
+  _getAutoBuildColumns(data = this.data) {
+    const columns = [];
+    const dataObj = data[0];
+
+    if (!dataObj) {
+      return columns;
+    }
+
+    for (const name of Object.keys(dataObj)) {
+      const column = { title: name, data: name };
+      columns.push(column);
+    }
+
+    return columns;
   }
 
   _getColumnsConfig() {
@@ -5010,6 +5059,7 @@ class Table extends Core {
     this.id = this.id || this.el.id;
     this.source = this.source || this.el.dataset.source;
     this.dataIdKey = this.dataIdKey || this.el.dataset.idkey || 'idno';
+    this.isAutoBuild = this.el.dataset.autobuild === 'true' ? true : false;
     this.data = this.source
       ? await this.getData(this.source)
       : this.getPreviewData();
@@ -5881,7 +5931,7 @@ class Menu extends Core {
         },
         [iconEl, textEl]
       );
-      
+
       if (item.children.length === 0) {
         delete aEl.dataset.bsTarget;
         delete aEl.dataset.bsToggle;
