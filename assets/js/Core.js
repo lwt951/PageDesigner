@@ -1132,25 +1132,15 @@ class Core {
     ];
   }
 
-  getUrlParams(url = window.location.href) {
-    const urlAfterQuestion = url.split('?')[1];
+  getUrlParams(searchParams = window.location.search) {
+    const searchObj = new URLSearchParams(searchParams);
+    const paramsObj = {};
 
-    if (!urlAfterQuestion) {
-      return {};
+    for (const [key, value] of searchObj) {
+      paramsObj[key] = value;
     }
 
-    const params = urlAfterQuestion.split('&');
-    const result = {};
-
-    for (const paramStr of params) {
-      const keyValue = paramStr.split('=');
-      const key = keyValue[0];
-      const value = keyValue[1];
-
-      result[key] = value;
-    }
-
-    return result;
+    return paramsObj;
   }
 
   isEl(el) {
@@ -1666,7 +1656,7 @@ class Core {
 class Page extends Core {
   constructor(config = {}) {
     super();
-    this.root = document.getElementById(config.id || 'main');
+    this.root = config.root || document.getElementById(config.id || 'main');
     this.source = config.source || '';
     this.container = null;
     this.isEditing = false;
@@ -1687,7 +1677,7 @@ class Page extends Core {
     Page.instance = this;
 
     if (!this.isEl(this.root)) {
-      throw new Error("Element with the provided 'id' does not exist!");
+      throw new Error('Element root does not exist!');
     }
   }
 
