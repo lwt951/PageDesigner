@@ -20,6 +20,7 @@ openSidebarBtn?.addEventListener('click', () => {
     menuEditorSwitch.click();
   }
 });
+
 closeSidebarBtn.addEventListener('click', () => {
   sidebar?.classList.remove('active-sidebar');
 });
@@ -81,7 +82,7 @@ const hashChange = async (hash) => {
   window.page?.dispose();
   window.page = new Page();
 
-  const response = await axios.get(`./pages/${hash}.html`).catch((err) => {
+  const response = await axios.get(`./components/${hash}.html`).catch((err) => {
     console.warn(err);
   });
   const designHtml = response?.data || '<div>No Data!</div>';
